@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 
 @Entity
@@ -18,7 +19,8 @@ public class Availability {
     private Long id;
 
     @Column(nullable = false)
-    private String day;
+    @Enumerated(EnumType.STRING)
+    private DayOfWeek day;
 
     @Column(nullable = false)
     private LocalTime startTime;
@@ -26,11 +28,13 @@ public class Availability {
     @Column(nullable = false)
     private LocalTime endTime;
 
+    private Boolean inUse;
+
     @ManyToOne
     @JoinColumn(name = "teacher_id")
     private Teacher teacher;
 
-    public Availability(String day, LocalTime startTime, LocalTime endTime) {
+    public Availability(DayOfWeek day, LocalTime startTime, LocalTime endTime) {
         this.day = day;
         this.startTime = startTime;
         this.endTime = endTime;

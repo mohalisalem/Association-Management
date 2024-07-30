@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.DayOfWeek;
+import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -19,6 +21,11 @@ public class ClassSubject {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+    @Enumerated(EnumType.STRING)
+    private DayOfWeek day;
+
+    private LocalTime startSession;
 
 
     @ManyToOne

@@ -6,8 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @NoArgsConstructor
@@ -33,7 +32,7 @@ public class StudentInfo {
     private String educationLevel;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "studentInfo")
-    private List<Student> studentHistory = new ArrayList<>();
+    private Set<Student> studentHistory = new HashSet<>();
 
 
     public StudentInfo(String lastName, String name, String phoneNumber) {
@@ -42,5 +41,16 @@ public class StudentInfo {
         this.phoneNumber = phoneNumber;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StudentInfo that = (StudentInfo) o;
+        return Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(lastName, that.lastName) && Objects.equals(birthDate, that.birthDate);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, lastName, birthDate);
+    }
 }
