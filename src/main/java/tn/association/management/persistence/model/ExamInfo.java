@@ -17,6 +17,8 @@ public class ExamInfo {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    private String examTitle;
+
     private LocalDateTime date;
 
     // use hours as unit

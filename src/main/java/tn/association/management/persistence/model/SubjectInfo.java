@@ -22,7 +22,7 @@ public class SubjectInfo {
 
     private String sourceAuthor;
 
-    private String SubjectDuration;
+    private String subjectDuration;
 
     private Integer singleSessionDuration;
 
