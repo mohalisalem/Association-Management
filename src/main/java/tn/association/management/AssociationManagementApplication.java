@@ -1,0 +1,13 @@
+package tn.association.management;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class AssociationManagementApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(AssociationManagementApplication.class, args);
+	}
+
+}
