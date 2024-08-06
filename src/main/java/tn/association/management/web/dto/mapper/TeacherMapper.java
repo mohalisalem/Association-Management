@@ -11,7 +11,7 @@ import tn.association.management.web.dto.TeacherDTO;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Mapper(uses = {TeacherAttendanceMapper.class}, componentModel = "spring")
+@Mapper(uses = {TeacherAttendanceMapper.class, TeacherInfoMapper.class}, componentModel = "spring")
 public interface TeacherMapper {
     TeacherMapper INSTANCE = Mappers.getMapper(TeacherMapper.class);
 

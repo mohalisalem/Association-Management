@@ -13,7 +13,9 @@ public interface StudentMapper {
 
     @Mapping(target = "studentAttendances", ignore = true)
     @Mapping(target = "studentScores", ignore = true)
+    @Mapping(target = "AClass", source = "aClass")
     Student convertToEntity(StudentDTO studentDTO);
 
+    @Mapping(target = "aClass", source = "AClass")
     StudentDTO convertToDTO(Student student);
 }

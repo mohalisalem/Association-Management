@@ -17,6 +17,8 @@ public interface ExamInfoRepository extends CrudRepository<ExamInfo, Long> {
 
     List<ExamInfo> findByExamTitle(String examTitle);
 
+    List<ExamInfo> findBySubject_id(Long subjectId);
+
     Optional<ExamInfo> findByExamTitleAndDate(String examTitle, LocalDateTime date);
 
 }

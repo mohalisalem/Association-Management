@@ -19,11 +19,13 @@ public interface AvailabilityService {
 
     AvailabilityDTO reservePartOfAvailability(Long availabilityId, LocalTime startTime, LocalTime endTime);
 
-    AvailabilityDTO editAvailability(Long availabilityId, DayOfWeek day, LocalTime startTime, LocalTime endTime,  Teacher teacher);
+    AvailabilityDTO editAvailability(Long availabilityId, DayOfWeek day, LocalTime startTime, LocalTime endTime, Boolean inUse, Teacher teacher);
 
     void deleteAvailability(Long availabilityId);
 
     List<AvailabilityDTO> getAllAvailabilities();
+
+    List<AvailabilityDTO> getAllTeacherAvailabilities(Long teacherId);
 
     List<AvailabilityDTO> getAvailabilitiesByDay(DayOfWeek day);
 
@@ -31,6 +33,6 @@ public interface AvailabilityService {
 
     AvailabilityDTO getTeacherAvailability(Long teacherId, DayOfWeek day, LocalTime startTime, LocalTime endTime);
 
-    List<AvailabilityDTO> getTeacherAvailabilitiesByDay(DayOfWeek day);
+    List<AvailabilityDTO> getTeacherAvailabilitiesByDay(Long teacherId, DayOfWeek day);
 
 }

@@ -12,10 +12,10 @@ public interface TeacherInfoRepository extends CrudRepository<TeacherInfo, Long>
 
     List<TeacherInfo> findByLastName(String lastName);
 
-    List<TeacherInfo> findByPhoneNumber(String phoneNumber);
+    TeacherInfo findByPhoneNumber(String phoneNumber);
 
     List<TeacherInfo> findBySubjectsAbleToTeach(String subjectsAbleToTeach);
 
-    Optional<TeacherInfo> findByNameAndLastName(String name, String lastName);
+    TeacherInfo findByNameAndLastName(String name, String lastName);
 
 }

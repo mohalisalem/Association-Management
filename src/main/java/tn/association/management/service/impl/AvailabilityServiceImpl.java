@@ -14,7 +14,8 @@ import tn.association.management.web.exception.WrongAvailabilityException;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class AvailabilityServiceImpl implements AvailabilityService {
 
@@ -26,7 +27,7 @@ public class AvailabilityServiceImpl implements AvailabilityService {
 
     @Override
     public AvailabilityDTO getAvailabilityById(Long id) {
-        Availability foundAvailability = getAvailabilitybyIdOrThrowException(id);
+        Availability foundAvailability = getAvailabilityByIdOrThrowException(id);
         return availabilityMapper.convertToDTO(foundAvailability);
     }
 
@@ -44,7 +45,7 @@ public class AvailabilityServiceImpl implements AvailabilityService {
         if (teacher == null) {
             throw new NullAttributeException("The teacher must be not null");
         }
-        Availability availability = getAvailabilitybyIdOrThrowException(availabilityId);
+        Availability availability = getAvailabilityByIdOrThrowException(availabilityId);
         availability.setTeacher(teacher);
         availability = availabilityRepository.save(availability);
         return availabilityMapper.convertToDTO(availability);
@@ -52,8 +53,8 @@ public class AvailabilityServiceImpl implements AvailabilityService {
 
     @Override
     public AvailabilityDTO reserveAvailability(Long availabilityId) {
-        Availability availability = getAvailabilitybyIdOrThrowException(availabilityId);
-        if(availability.getInUse()){
+        Availability availability = getAvailabilityByIdOrThrowException(availabilityId);
+        if (availability.getInUse()) {
             throw new WrongAvailabilityException("the teacher's availability is already reserved.");
         }
         availability.setInUse(true);
@@ -63,24 +64,24 @@ public class AvailabilityServiceImpl implements AvailabilityService {
 
     @Override
     public AvailabilityDTO reservePartOfAvailability(Long availabilityId, LocalTime startTime, LocalTime endTime) {
-        Availability availability = getAvailabilitybyIdOrThrowException(availabilityId);
+        Availability availability = getAvailabilityByIdOrThrowException(availabilityId);
 
-        if(availability.getInUse()){
+        if (availability.getInUse()) {
             throw new WrongAvailabilityException("the teacher's availability is already reserved.");
         }
 
-        if(availability.getStartTime().equals(startTime) && availability.getEndTime().equals(endTime)){
+        if (availability.getStartTime().equals(startTime) && availability.getEndTime().equals(endTime)) {
             availability.setInUse(true);
             availability = availabilityRepository.save(availability);
             return availabilityMapper.convertToDTO(availability);
-        } else if(availability.getStartTime().isAfter(startTime) || availability.getEndTime().isBefore(endTime)) {
+        } else if (availability.getStartTime().isAfter(startTime) || availability.getEndTime().isBefore(endTime)) {
             throw new WrongAvailabilityException("the teacher isn't available on the wanted time slot.");
-        } else if(availability.getStartTime().isBefore(startTime) && availability.getEndTime().isAfter(endTime)){
+        } else if (availability.getStartTime().isBefore(startTime) && availability.getEndTime().isAfter(endTime)) {
             LocalTime finalAvailabilityEndTime = availability.getEndTime();
             Availability reservedAvailability = createUnreservedBeforeReservation(availability, startTime, endTime);
             availabilityRepository.save(new Availability(availability.getDay(), endTime, finalAvailabilityEndTime));
             return availabilityMapper.convertToDTO(reservedAvailability);
-        } else if(availability.getStartTime().isBefore(startTime)){
+        } else if (availability.getStartTime().isBefore(startTime)) {
             Availability reservedAvailability = createUnreservedBeforeReservation(availability, startTime, endTime);
             return availabilityMapper.convertToDTO(reservedAvailability);
         } else {
@@ -94,7 +95,8 @@ public class AvailabilityServiceImpl implements AvailabilityService {
         }
     }
 
-    private Availability createUnreservedBeforeReservation(Availability availability, LocalTime startTime, LocalTime endTime){
+    private Availability createUnreservedBeforeReservation(Availability availability, LocalTime startTime,
+                                                           LocalTime endTime) {
         availability.setEndTime(startTime);
         availabilityRepository.save(availability);
         Availability reservedAvailability = new Availability(availability.getDay(), startTime, endTime);
@@ -103,47 +105,70 @@ public class AvailabilityServiceImpl implements AvailabilityService {
     }
 
     @Override
-    public AvailabilityDTO editAvailability(Long availabilityId, DayOfWeek day, LocalTime startTime, LocalTime endTime, Teacher teacher) {
-        return null;
+    public AvailabilityDTO editAvailability(Long availabilityId, DayOfWeek day, LocalTime startTime, LocalTime endTime,
+                                            Boolean inUse, Teacher teacher) {
+        Availability availability = getAvailabilityByIdOrThrowException(availabilityId);
+        availability.setDay(day);
+        availability.setStartTime(startTime);
+        availability.setEndTime(endTime);
+        availability.setInUse(inUse);
+        availability.setTeacher(teacher);
+        return availabilityMapper.convertToDTO(availabilityRepository.save(availability));
     }
 
     @Override
     public void deleteAvailability(Long availabilityId) {
-
+        availabilityRepository.deleteById(availabilityId);
     }
 
     @Override
     public List<AvailabilityDTO> getAllAvailabilities() {
-        return List.of();
+        Iterable<Availability> allAvailabilities = availabilityRepository.findAll();
+        return StreamSupport.stream(allAvailabilities.spliterator(), false)
+                .map(availabilityMapper::convertToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AvailabilityDTO> getAllTeacherAvailabilities(Long teacherId) {
+        return availabilityRepository.findByTeacher_id(teacherId)
+                .stream().map(availabilityMapper::convertToDTO).collect(Collectors.toList());
     }
 
     @Override
     public List<AvailabilityDTO> getAvailabilitiesByDay(DayOfWeek day) {
-        return List.of();
+        return availabilityRepository.findByDay(day)
+                .stream()
+                .map(availabilityMapper::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<AvailabilityDTO> getAvailabilitiesByDayAndStartTimeAndEndTime(DayOfWeek day, LocalTime startTime, LocalTime endTime) {
-        return List.of();
+    public List<AvailabilityDTO> getAvailabilitiesByDayAndStartTimeAndEndTime(DayOfWeek day, LocalTime startTime,
+                                                                              LocalTime endTime) {
+        return availabilityRepository.findByDayAndStartTimeAndEndTime(day, startTime, endTime)
+                .stream().map(availabilityMapper::convertToDTO).collect(Collectors.toList());
     }
 
     @Override
     public AvailabilityDTO getTeacherAvailability(Long teacherId, DayOfWeek day, LocalTime startTime, LocalTime endTime) {
-        return null;
+        Availability availability = availabilityRepository
+                .findByTeacher_idAndDayAndStartTimeAndEndTime(teacherId, day, startTime, endTime);
+        return availabilityMapper.convertToDTO(availability);
     }
 
     @Override
-    public List<AvailabilityDTO> getTeacherAvailabilitiesByDay(DayOfWeek day) {
-        return List.of();
+    public List<AvailabilityDTO> getTeacherAvailabilitiesByDay(Long teacherId, DayOfWeek day) {
+        return availabilityRepository.findByTeacher_idAndDay(teacherId, day)
+                .stream().map(availabilityMapper::convertToDTO).collect(Collectors.toList());
     }
 
 
-    private Availability getAvailabilitybyIdOrThrowException(Long id){
+    private Availability getAvailabilityByIdOrThrowException(Long id) {
         if (id == null) {
             throw new NullAttributeException("The id must be not null");
         }
-        return availabilityRepository.
-                findById(id).orElseThrow(() -> new EntityNotFoundException(" there is no Availability with the given id" + id));
+        return availabilityRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(" there is no Availability with the given id" + id));
 
     }
 }

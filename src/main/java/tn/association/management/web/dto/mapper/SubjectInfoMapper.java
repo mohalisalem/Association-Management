@@ -11,6 +11,7 @@ public interface SubjectInfoMapper {
 
     SubjectInfoMapper INSTANCE = Mappers.getMapper(SubjectInfoMapper.class);
 
+    @Mapping(target = "level", ignore = true)
     SubjectInfo convertToEntity(SubjectInfoDTO subjectInfoDTO);
 
     @Mapping(target = "levelId", source = "level.id")

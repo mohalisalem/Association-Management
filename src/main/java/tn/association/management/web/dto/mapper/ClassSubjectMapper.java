@@ -16,7 +16,9 @@ public interface ClassSubjectMapper {
     @Mapping(target = "teacherAttendances", ignore = true)
     @Mapping(target = "studentAttendances", ignore = true)
     @Mapping(target = "studentExamScores", ignore = true)
+    @Mapping(target = "AClass", source = "aClass")
     ClassSubject convertToEntity(ClassSubjectDTO classSubjectDTO);
 
+    @Mapping(target = "aClass", source = "AClass")
     ClassSubjectDTO convertToDTO(ClassSubject classSubject);
 }
