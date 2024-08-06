@@ -30,7 +30,7 @@ public class LevelServiceImpl implements LevelService {
     @Override
     public LevelDTO addLevel(String name, String category) {
         if(name == null || category == null){
-            throw new NullAttributeException("The given parameters can't be null");
+            throw new NullAttributeException("given parameters");
         }
         Level level = new Level();
         level.setCategory(category);
@@ -41,7 +41,7 @@ public class LevelServiceImpl implements LevelService {
     @Override
     public LevelDTO editLevel(Long id, String name, String category) {
         if(name == null || category == null){
-            throw new NullAttributeException("The given parameters can't be null");
+            throw new NullAttributeException("given parameters");
         }
         Level level = getByIdWithoutConvert(id);
         level.setCategory(category);
@@ -52,7 +52,7 @@ public class LevelServiceImpl implements LevelService {
     @Override
     public void deleteLevel(Long id) {
         if (id == null) {
-            throw new NullAttributeException("The id must be not null");
+            throw new NullAttributeException("id");
         }
         levelRepository.deleteById(id);
     }
@@ -65,7 +65,7 @@ public class LevelServiceImpl implements LevelService {
 
     private Level getByIdWithoutConvert(Long id) {
         if (id == null) {
-            throw new NullAttributeException("The id must be not null");
+            throw new NullAttributeException("id");
         }
         return levelRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(" there is no Availability with the given id :" + id));

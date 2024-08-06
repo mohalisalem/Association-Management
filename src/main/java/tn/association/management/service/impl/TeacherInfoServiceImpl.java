@@ -8,6 +8,7 @@ import tn.association.management.web.dto.TeacherInfoDTO;
 import tn.association.management.web.dto.mapper.TeacherInfoMapper;
 import tn.association.management.web.exception.EntityNotFoundException;
 import tn.association.management.web.exception.NullAttributeException;
+import tn.association.management.web.exception.WrongPhoneNumberException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,7 +38,7 @@ public class TeacherInfoServiceImpl implements TeacherInfoService {
     public TeacherInfoDTO editTeacherInfo(Long id, String name, String lastName, String phoneNumber,
                                           String subjectsAbleToTeach) {
         if (name == null || lastName == null || phoneNumber == null) {
-            throw new NullAttributeException(" the given parameters can't be null.");
+            throw new NullAttributeException("given parameters");
         }
         TeacherInfo teacherInfo = getByIdWithoutConvert(id);
         teacherInfo.setName(name);
@@ -50,7 +51,7 @@ public class TeacherInfoServiceImpl implements TeacherInfoService {
     @Override
     public void deleteTeacherInfo(Long id) {
         if (id == null) {
-            throw new NullAttributeException("The id must be not null");
+            throw new NullAttributeException("id");
         }
         teacherInfoRepository.deleteById(id);
     }
@@ -64,7 +65,10 @@ public class TeacherInfoServiceImpl implements TeacherInfoService {
     @Override
     public TeacherInfoDTO getTeacherInfoByPhoneNumber(String phoneNumber) {
         if (phoneNumber == null) {
-            throw new NullAttributeException("The phoneNumber must be not null");
+            throw new NullAttributeException("phoneNumber");
+        }
+        if(!phoneNumber.chars().allMatch(Character::isDigit)){
+            throw new WrongPhoneNumberException();
         }
         return teacherInfoMapper.convertToDTO(teacherInfoRepository.findByPhoneNumber(phoneNumber));
     }
@@ -72,7 +76,7 @@ public class TeacherInfoServiceImpl implements TeacherInfoService {
     @Override
     public List<TeacherInfoDTO> getTeachersInfoByName(String name) {
         if (name == null) {
-            throw new NullAttributeException("The name must be not null");
+            throw new NullAttributeException("name");
         }
         return teacherInfoRepository.findByName(name).stream().map(teacherInfoMapper::convertToDTO).collect(Collectors.toList());
     }
@@ -80,14 +84,14 @@ public class TeacherInfoServiceImpl implements TeacherInfoService {
     @Override
     public TeacherInfoDTO getTeacherInfoByNameAndLastName(String name, String lastName) {
         if (name == null || lastName == null) {
-            throw new NullAttributeException("The given parameters must be not null.");
+            throw new NullAttributeException("given parameters");
         }
         return teacherInfoMapper.convertToDTO(teacherInfoRepository.findByNameAndLastName(name, lastName));
     }
 
     private TeacherInfo getByIdWithoutConvert(Long id) {
         if (id == null) {
-            throw new NullAttributeException("The id must be not null");
+            throw new NullAttributeException("id");
         }
         return teacherInfoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("there is no Teacher info with the given id :" + id));

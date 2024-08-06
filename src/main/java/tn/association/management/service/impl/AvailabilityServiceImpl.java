@@ -34,7 +34,7 @@ public class AvailabilityServiceImpl implements AvailabilityService {
     @Override
     public AvailabilityDTO addAvailability(DayOfWeek day, LocalTime startTime, LocalTime endTime) {
         if (day == null || startTime == null || endTime == null) {
-            throw new NullAttributeException("One of the given parameter is null");
+            throw new NullAttributeException("given parameter");
         }
         Availability availability = availabilityRepository.save(new Availability(day, startTime, endTime));
         return availabilityMapper.convertToDTO(availability);
@@ -43,7 +43,7 @@ public class AvailabilityServiceImpl implements AvailabilityService {
     @Override
     public AvailabilityDTO linkAvailabilityToTeacher(Long availabilityId, Teacher teacher) {
         if (teacher == null) {
-            throw new NullAttributeException("The teacher must be not null");
+            throw new NullAttributeException("teacher");
         }
         Availability availability = getAvailabilityByIdOrThrowException(availabilityId);
         availability.setTeacher(teacher);
@@ -64,6 +64,9 @@ public class AvailabilityServiceImpl implements AvailabilityService {
 
     @Override
     public AvailabilityDTO reservePartOfAvailability(Long availabilityId, LocalTime startTime, LocalTime endTime) {
+        if (startTime == null || endTime == null) {
+            throw new NullAttributeException("given parameters");
+        }
         Availability availability = getAvailabilityByIdOrThrowException(availabilityId);
 
         if (availability.getInUse()) {
@@ -107,6 +110,9 @@ public class AvailabilityServiceImpl implements AvailabilityService {
     @Override
     public AvailabilityDTO editAvailability(Long availabilityId, DayOfWeek day, LocalTime startTime, LocalTime endTime,
                                             Boolean inUse, Teacher teacher) {
+        if (teacher == null || day == null || startTime == null || endTime == null) {
+            throw new NullAttributeException("given parameters");
+        }
         Availability availability = getAvailabilityByIdOrThrowException(availabilityId);
         availability.setDay(day);
         availability.setStartTime(startTime);
@@ -118,6 +124,9 @@ public class AvailabilityServiceImpl implements AvailabilityService {
 
     @Override
     public void deleteAvailability(Long availabilityId) {
+        if (availabilityId == null) {
+            throw new NullAttributeException("availabilityId");
+        }
         availabilityRepository.deleteById(availabilityId);
     }
 
@@ -130,12 +139,18 @@ public class AvailabilityServiceImpl implements AvailabilityService {
 
     @Override
     public List<AvailabilityDTO> getAllTeacherAvailabilities(Long teacherId) {
+        if (teacherId == null) {
+            throw new NullAttributeException("teacherId");
+        }
         return availabilityRepository.findByTeacher_id(teacherId)
                 .stream().map(availabilityMapper::convertToDTO).collect(Collectors.toList());
     }
 
     @Override
     public List<AvailabilityDTO> getAvailabilitiesByDay(DayOfWeek day) {
+        if (day == null) {
+            throw new NullAttributeException("given parameters");
+        }
         return availabilityRepository.findByDay(day)
                 .stream()
                 .map(availabilityMapper::convertToDTO)
@@ -145,12 +160,18 @@ public class AvailabilityServiceImpl implements AvailabilityService {
     @Override
     public List<AvailabilityDTO> getAvailabilitiesByDayAndStartTimeAndEndTime(DayOfWeek day, LocalTime startTime,
                                                                               LocalTime endTime) {
+        if (day == null || startTime == null || endTime == null) {
+            throw new NullAttributeException("given parameters");
+        }
         return availabilityRepository.findByDayAndStartTimeAndEndTime(day, startTime, endTime)
                 .stream().map(availabilityMapper::convertToDTO).collect(Collectors.toList());
     }
 
     @Override
     public AvailabilityDTO getTeacherAvailability(Long teacherId, DayOfWeek day, LocalTime startTime, LocalTime endTime) {
+        if (teacherId == null || day == null || startTime == null || endTime == null) {
+            throw new NullAttributeException("given parameters");
+        }
         Availability availability = availabilityRepository
                 .findByTeacher_idAndDayAndStartTimeAndEndTime(teacherId, day, startTime, endTime);
         return availabilityMapper.convertToDTO(availability);
@@ -158,6 +179,9 @@ public class AvailabilityServiceImpl implements AvailabilityService {
 
     @Override
     public List<AvailabilityDTO> getTeacherAvailabilitiesByDay(Long teacherId, DayOfWeek day) {
+        if (teacherId == null || day == null) {
+            throw new NullAttributeException("given parameters");
+        }
         return availabilityRepository.findByTeacher_idAndDay(teacherId, day)
                 .stream().map(availabilityMapper::convertToDTO).collect(Collectors.toList());
     }
@@ -165,7 +189,7 @@ public class AvailabilityServiceImpl implements AvailabilityService {
 
     private Availability getAvailabilityByIdOrThrowException(Long id) {
         if (id == null) {
-            throw new NullAttributeException("The id must be not null");
+            throw new NullAttributeException("id");
         }
         return availabilityRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(" there is no Availability with the given id" + id));
